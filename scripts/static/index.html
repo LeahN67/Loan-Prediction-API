@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numida Loan Prediction API</title>
+    <style>
+        /* Basic styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        /* Styling for the form to make it centered and visually appealing */
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        /* Styling for inputs to provide better UI experience */
+        input[type="number"], input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        /* Styling for the result container to make it visually consistent with the form */
+        #result {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+            white-space: pre-wrap; /* Preserve formatting */
+            overflow-wrap: break-word; /* Prevent overflow */
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item strong {
+            display: block;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+    <script>
+        /**
+         * Function to handle the form submission.
+         * It prevents the default form submission behavior, processes the input, 
+         * sends it to the Flask API, and displays the response.
+         * @param {Event} event - The form submission event.
+         */
+        async function submitForm(event) {
+            event.preventDefault();  //Prevent default form submission behavior
+            
+            const formData = new FormData(event.target);  // Collect the form data
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            try {
+                // Send the data to the Flask backend for prediction
+                const response = await fetch('http://127.0.0.1:5003/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                // Parse the response and update the UI with the prediction result
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result-item"><strong>Repayment Probability:</strong> ${result.repayment_probability.toFixed(2)}</div>
+                        <div class="result-item"><strong>Predicted Yield:</strong> ${result.predicted_yield.toFixed(2)}</div>
+                        <div class="result-item"><strong>Predicted Days to Repayment:</strong> ${result.predicted_days_to_repayment}</div>
+                        <div class="result-item"><strong>Risk Score:</strong> ${result.risk_score.toFixed(2)}</div>
+                        <div class="result-item"><strong>Recommended Interest Rate:</strong> ${(result.recommended_interest_rate * 100).toFixed(2)}%</div>
+                    `;
+                } else {
+                    // Display error message in case of an error from the backend
+                    document.getElementById('result').innerHTML = `<div class="result-item">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                // Display error message in case of a network or system error
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = '<div class="result-item">Error occurred</div>';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Numida Loan Prediction API</h1>
+    <!-- Form for collecting user input required for loan prediction -->
+    <form id="predictionForm" onsubmit="submitForm(event)">
+        <!-- Principal input field -->
+        <label for="principal">Principal:</label>
+        <input type="number" id="principal" name="principal" required>
+        
+        <!-- Total owing at issue input field -->
+        <label for="total_owing_at_issue">Total Owing at Issue:</label>
+        <input type="number" id="total_owing_at_issue" name="total_owing_at_issue" required>
+        
+        <!-- Employee count input field -->
+        <label for="employee_count">Employee Count:</label>
+        <input type="number" id="employee_count" name="employee_count" required>
+        
+        <!-- Dismissal description input field (text-based categorical) -->
+        <label for="dismissal_description">Dismissal Description:</label>
+        <input type="text" id="dismissal_description" name="dismissal_description" required>
+        
+        <!-- Acquisition channel input field (text-based categorical) -->
+        <label for="acquisition_channel">Acquisition Channel:</label>
+        <input type="text" id="acquisition_channel" name="acquisition_channel" required>
+        
+        <!-- Sector input field (text-based categorical) -->
+        <label for="sector">Sector:</label>
+        <input type="text" id="sector" name="sector" required>
+        
+        <!-- Repayment ratio input field -->
+        <label for="repayment_ratio">Repayment Ratio:</label>
+        <input type="number" step="0.01" id="repayment_ratio" name="repayment_ratio" required>
+        
+        <!-- Application month input field -->
+        <label for="application_month">Application Month:</label>
+        <input type="number" id="application_month" name="application_month" required>
+        
+        <!-- Average past yield input field -->
+        <label for="avg_past_yield">Average Past Yield:</label>
+        <input type="number" step="0.01" id="avg_past_yield" name="avg_past_yield" required>
+        
+        <!-- Average past days to repayment input field -->
+        <label for="avg_past_days_to_repayment">Average Past Days to Repayment:</label>
+        <input type="number" id="avg_past_days_to_repayment" name="avg_past_days_to_repayment" required>
+        
+        <!-- Most common transaction type input field -->
+        <label for="most_common_transaction_type">Most Common Transaction Type:</label>
+        <input type="text" id="most_common_transaction_type" name="most_common_transaction_type" required>
+        
+        <!-- Submit button to trigger the prediction -->
+        <input type="submit" value="Get Prediction">
+    </form>
+
+    <!-- Section to display prediction results -->
+    <h2>Result:</h2>
+    <div id="result"></div>
+</body>
+</html>
