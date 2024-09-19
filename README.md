@@ -72,7 +72,7 @@ It also calculates a risk score and recommends an interest rate based on these p
 - `model_development.py`: Trains and evaluates the machine learning models
 - `app.py`: Flask application serving the API
 - `static/index.html`: Simple web interface for interacting with the API
-- `data/`: Directory containing the input CSV files (not included in the repository - The folder is too large)
+- `data/`: Directory containing the input CSV and numpy files
 - `models/`: Directory where trained models are saved
 - `requirements.txt`: List of Python packages required for the project
 
