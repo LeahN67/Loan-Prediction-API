@@ -33,8 +33,8 @@ It also calculates a risk score and recommends an interest rate based on these p
 
 1. Clone the repository:
    ```
-   git clone https://github.com/LeahN67/Loan-Prediction.git
-   cd Loan-Prediction
+   git clone https://github.com/LeahN67/Loan-Prediction-API.git
+      cd Loan-Prediction-API
    ```
 
 2. Ensure you have Python 3.10.0 installed. You can check your Python version with:
